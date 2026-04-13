@@ -1,0 +1,18 @@
+.training-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 100px;
+  align-items: center;
+  min-height: 48px;
+}
+
+.training-item__actions {
+  display: flex;
+  gap: 12px;
+}
+
+.training-item__actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
