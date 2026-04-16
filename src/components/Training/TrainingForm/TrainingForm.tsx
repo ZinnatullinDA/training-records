@@ -3,6 +3,39 @@ import type { TrainingRecord } from '@/types/training'
 import { useState } from 'react'
 import './TrainingForm.css'
 
+function formatDateInput(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8)
+  const day = digits.slice(0, 2)
+  const month = digits.slice(2, 4)
+  const year = digits.slice(4, 8)
+
+  return [day, month, year].filter(Boolean).join('.')
+}
+
+function isValidDate(value: string): boolean {
+  const [day, month, year] = value.split('.').map(Number)
+
+  if ([day, month, year].some(Number.isNaN)) {
+    return false
+  }
+
+  const date = new Date(year, month - 1, day)
+
+  if (
+    date.getFullYear() !== year
+    || date.getMonth() !== month - 1
+    || date.getDate() !== day
+  ) {
+    return false
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  date.setHours(0, 0, 0, 0)
+
+  return date.getTime() >= today.getTime()
+}
+
 interface TrainingFormProps {
   onSubmit: (date: string, distance: number) => void
   editingRecord: TrainingRecord | null
@@ -16,6 +49,7 @@ export default function TrainingForm({
 }: TrainingFormProps) {
   const [date, setDate] = useState(() => editingRecord?.date ?? '')
   const [distance, setDistance] = useState(() => editingRecord ? String(editingRecord.distance) : '')
+  const [dateError, setDateError] = useState('')
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -27,6 +61,12 @@ export default function TrainingForm({
       return
     }
 
+    if (!isValidDate(trimmedDate)) {
+      setDateError('Дата должна быть не позже сегодняшнего дня и в формате ДД.ММ.ГГГГ')
+      return
+    }
+
+    setDateError('')
     onSubmit(trimmedDate, parsedDistance)
     setDate('')
     setDistance('')
@@ -39,15 +79,27 @@ export default function TrainingForm({
     >
       <div className="training-form__field">
         <label htmlFor="date">
-          Дата (ДД.ММ.ГГ)
+          Дата (ДД.ММ.ГГГГ)
         </label>
         <input
           id="date"
-          onChange={e => setDate(e.target.value)}
+          inputMode="numeric"
+          maxLength={10}
+          onChange={(e) => {
+            setDate(formatDateInput(e.target.value))
+            if (dateError) {
+              setDateError('')
+            }
+          }}
           placeholder="20.07.2019"
           type="text"
           value={date}
         />
+        {dateError && (
+          <span className="training-form__error">
+            {dateError}
+          </span>
+        )}
       </div>
 
       <div className="training-form__field">
@@ -77,6 +129,7 @@ export default function TrainingForm({
           onClick={() => {
             setDate('')
             setDistance('')
+            setDateError('')
             onCancelEdit()
           }}
           type="button"

@@ -20,6 +20,13 @@
   font-size: 16px;
 }
 
+.training-form__error {
+  color: #c62828;
+  font-size: 12px;
+  line-height: 1.2;
+  max-width: 180px;
+}
+
 .training-form__button {
   width: 90px;
   height: 46px;
