@@ -62,7 +62,7 @@ export default function TrainingForm({
     }
 
     if (!isValidDate(trimmedDate)) {
-      setDateError('Дата должна быть не позже сегодняшнего дня и в формате ДД.ММ.ГГГГ')
+      setDateError('Дата должна быть не раньше сегодняшнего дня и в формате ДД.ММ.ГГГГ')
       return
     }
 
